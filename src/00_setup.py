@@ -18,7 +18,7 @@ except Exception as e:  # noqa: BLE001
 
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS `{CATALOG}`.`{SCHEMA}` COMMENT 'Fictional Danish bakery chain – demo data'")
 
-# If row filters from src/sql/12_optional_row_filter.sql are active, overwriting the tables fails.
+# If row filters from src/sql/12_row_filter.sql are active, overwriting the tables fails.
 for t in ("fact_sales", "fact_production"):
     try:
         spark.sql(f"ALTER TABLE `{CATALOG}`.`{SCHEMA}`.{t} DROP ROW FILTER")

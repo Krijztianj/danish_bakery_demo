@@ -1,5 +1,5 @@
 -- =====================================================================
--- OPTIONAL – governance moment: one row filter, enforced in every tool.
+-- OPTIONAL – governance: one row filter, enforced in every tool.
 --
 -- Row filters live on the TABLES; anyone querying the metric view gets them applied.
 -- In Power BI this only holds per viewer when the semantic model uses DirectQuery
@@ -7,9 +7,10 @@
 -- the credential owner sees.
 --
 -- Prereq: create account groups 'swirl_hq' and 'swirl_region_central'
--- (Account console → User management → Groups) and add a demo user to the regional group.
--- Group membership changes can take a few minutes to apply – set it up the day before.
+-- (Account console → User management → Groups) and add a test user to the regional group.
+-- Group membership changes can take a few minutes to apply.
 -- =====================================================================
+-- Change these two lines if you deployed with a different catalog / schema.
 USE CATALOG swirl_demo;
 USE SCHEMA bakery;
 
@@ -30,6 +31,6 @@ ALTER TABLE fact_production SET ROW FILTER store_region_filter ON (store_id);
 -- Check as yourself, then as the regional demo user:
 SELECT region, MEASURE(net_revenue) FROM sales_metrics GROUP BY ALL;
 
--- Remove after the demo:
+-- Remove when you're done (src/00_setup.py also drops them before regenerating data):
 -- ALTER TABLE fact_sales      DROP ROW FILTER;
 -- ALTER TABLE fact_production DROP ROW FILTER;

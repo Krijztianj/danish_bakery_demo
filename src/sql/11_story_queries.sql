@@ -1,7 +1,9 @@
 -- =====================================================================
--- STORY QUERIES – rehearse these, and keep them as a backup if Genie misbehaves live.
+-- STORY QUERIES – one query per story planted in the generated data (see src/demo_config.py).
 -- Every query reads ONLY the metric views: no joins, no business logic in the query.
+-- Compare the results with what Genie answers for the same questions.
 -- =====================================================================
+-- Change these two lines if you deployed with a different catalog / schema.
 USE CATALOG swirl_demo;
 USE SCHEMA bakery;
 
@@ -49,7 +51,7 @@ FROM sales_metrics
 WHERE order_month = date_trunc('MONTH', add_months(current_date(), -1)) AND store_format IN ('Station', 'Campus')
 GROUP BY ALL ORDER BY store_format, daypart;
 
--- F · Staff purchases by store (sets up the live "CFO change")
+-- F · Staff purchases by store (context for the definition change in src/05_cfo_change.py)
 SELECT store_name,
        MEASURE(net_revenue) AS net_revenue,
        SUM(net_amount) FILTER (WHERE is_staff_purchase AND NOT is_refunded) AS staff_net_revenue

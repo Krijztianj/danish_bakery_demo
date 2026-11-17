@@ -2,7 +2,12 @@ bundle:
   name: swirl-metric-views-demo
 
 include:
-  - resources/*.yml
+  - resources/dashboard.yml
+  - resources/genie_space.yml
+  # Optional: publish sales_metrics to Power BI. Needs the "Publish Metric Views To Power BI"
+  # preview, a Unity Catalog connection of type Power BI and a PPU / Premium / Fabric workspace.
+  # See "Optional: Power BI" in the README before uncommenting.
+  # - resources/powerbi_job.yml
 
 variables:
   catalog:
@@ -17,13 +22,13 @@ variables:
   warehouse_id:
     description: Serverless SQL warehouse used by the app, dashboard, Genie and Power BI
   powerbi_workspace:
-    description: Name of the Power BI workspace (PPU / Premium / Fabric) to publish to
+    description: (Power BI only) Name of the Power BI workspace (PPU / Premium / Fabric) to publish to
     default: "Swirl Demo"
   powerbi_connection:
-    description: Name of the Unity Catalog connection of type Power BI
+    description: (Power BI only) Name of the Unity Catalog connection of type Power BI
     default: "powerbi"
   powerbi_model_name:
-    description: Name of the Power BI semantic model
+    description: (Power BI only) Name of the Power BI semantic model
     default: "Swirl Sales (metric view)"
 
 resources:
@@ -51,13 +56,15 @@ resources:
             notebook_path: ./src/03_legacy_views.py
             base_parameters: {catalog: "${var.catalog}", schema: "${var.schema}"}
 
-    # Nightly refresh keeps "yesterday" and "last month" current up to the demo day.
+    # Optional nightly refresh: regenerates the data up to yesterday so "last month" and the
+    # app's "last 28 days" stay current. Paused by default; unpause it in the Jobs UI if you
+    # keep the demo running for a while.
     swirl_refresh:
       name: "Swirl & Sons – 2. Nightly data refresh"
       schedule:
         quartz_cron_expression: "0 30 4 * * ?"
         timezone_id: Europe/Copenhagen
-        pause_status: PAUSED   # unpause the week before the talk
+        pause_status: PAUSED
       tasks:
         - task_key: generate_data
           notebook_task:
@@ -70,6 +77,20 @@ resources:
       description: "Store Cockpit – every number from Unity Catalog metric views"
       source_code_path: ./app
       user_api_scopes: [sql, dashboards.genie]
+      # App config lives here (not in app/app.yaml) so catalog/schema follow the bundle variables.
+      config:
+        command: ["streamlit", "run", "app.py"]
+        env:
+          - name: DATABRICKS_WAREHOUSE_ID
+            value_from: sql-warehouse
+          - name: GENIE_SPACE_ID
+            value_from: genie-space
+          - name: MV_CATALOG
+            value: ${var.catalog}
+          - name: MV_SCHEMA
+            value: ${var.schema}
+          - name: STREAMLIT_BROWSER_GATHER_USAGE_STATS
+            value: "false"
       resources:
         - name: sql-warehouse
           sql_warehouse:

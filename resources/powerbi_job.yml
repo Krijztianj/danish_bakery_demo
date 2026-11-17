@@ -1,9 +1,11 @@
 # Publishes (and republishes) the sales_metrics metric view to Power BI as a
 # DirectQuery semantic model. Run it once to create the model, and again after
-# every metric view change (e.g. the live CFO change).
+# every metric view change (e.g. after src/05_cfo_change.py).
 #
-# Prereq: a Unity Catalog connection of type Power BI (set var.powerbi_connection)
-# and a Power BI workspace in PPU / Premium / Fabric capacity with XMLA read-write.
+# Optional and NOT deployed by default: uncomment it under `include` in databricks.yml.
+# Prereqs: the "Publish Metric Views To Power BI" preview, a Unity Catalog connection of
+# type Power BI (var.powerbi_connection) and a Power BI workspace in PPU / Premium / Fabric
+# capacity with XMLA read-write. See "Optional: Power BI" in the README.
 
 resources:
   jobs:

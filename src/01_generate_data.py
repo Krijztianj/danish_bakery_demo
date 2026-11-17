@@ -18,7 +18,7 @@
 # MAGIC 3. **Shrovetide (Fastelavn)** – Shrovetide buns explode in the 10 days before Shrovetide Sunday.
 # MAGIC 4. **New store** – Aalborg opens 1 Apr 2025 (no prior-year comparison).
 # MAGIC 5. **Waste problem** – Esbjerg over-bakes bread (~30% waste vs ~10% elsewhere).
-# MAGIC 6. **Staff purchases** – ~3% of in-store orders at 50% off; Copenhagen - Vesterbro ~8% (fuels the live "CFO change").
+# MAGIC 6. **Staff purchases** – ~3% of in-store orders at 50% off; Copenhagen - Vesterbro ~8% (used by the definition change in `05_cfo_change.py`).
 # MAGIC 7. **Online growth** – Webshop & App grows ~45% per year, with higher refund rate.
 # MAGIC 8. **Commuters vs students** – station stores peak 07–09, campus store collapses in July.
 # MAGIC

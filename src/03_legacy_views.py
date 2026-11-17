@@ -3,7 +3,8 @@
 # MAGIC # 03 · The "before" world: three legacy definitions of revenue
 # MAGIC
 # MAGIC Three plausible views that each answer *"What was revenue and average basket last month?"* –
-# MAGIC and each gets it wrong for a different, very common reason. They power the cold open.
+# MAGIC and each gets it wrong for a different, very common reason. Compare them with the metric view
+# MAGIC in `src/sql/10_three_revenue_numbers.sql`.
 # MAGIC
 # MAGIC | View | Who built it | What's wrong |
 # MAGIC |---|---|---|

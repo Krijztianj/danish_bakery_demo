@@ -1,11 +1,14 @@
 -- =====================================================================
--- COLD OPEN – "Three numbers, one bakery"
--- Run in the SQL editor on a SQL warehouse. Ask the room: which one is right?
+-- THREE NUMBERS, ONE BAKERY
+-- "What was revenue and average basket last month?" answered by three legacy views
+-- (src/03_legacy_views.py), each wrong for a common reason, and then by the metric view.
+-- Run in the SQL editor on a SQL warehouse.
 -- =====================================================================
+-- Change these two lines if you deployed with a different catalog / schema.
 USE CATALOG swirl_demo;
 USE SCHEMA bakery;
 
--- 1) The question every bakery CEO asks on the 1st of the month
+-- 1) The legacy answers: three different numbers for the same question
 WITH last_month AS (SELECT date_trunc('MONTH', add_months(current_date(), -1)) AS month),
 store_ops AS (
   SELECT month,
@@ -25,7 +28,7 @@ ORDER BY report;
 
 
 -- =====================================================================
--- REVEAL – after the metric view tour: the governed answer
+-- THE GOVERNED ANSWER – the same question through the metric view
 -- =====================================================================
 WITH truth AS (
   SELECT MEASURE(net_revenue) AS revenue,

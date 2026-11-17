@@ -1,14 +1,15 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # 05 · The live "CFO change" (fallback + reset)
+# MAGIC # 05 · Change a definition once, everywhere ("the CFO change")
 # MAGIC
-# MAGIC **On stage, do this in the metric view editor** (Catalog Explorer → `sales_metrics` → Edit),
-# MAGIC by appending `AND NOT is_staff_purchase` to the **Net Revenue** measure. It is more convincing
-# MAGIC when the audience sees you type it.
+# MAGIC Scenario: the CFO decides staff purchases no longer count as revenue. You change the
+# MAGIC **Net Revenue** measure in one place, and the dashboard, Genie, the app (and Power BI, after
+# MAGIC a republish) all show the new number.
 # MAGIC
-# MAGIC Use this notebook:
-# MAGIC * `mode = apply` – fallback if the editor misbehaves live.
-# MAGIC * `mode = reset` – put the original definition back after the rehearsal / talk.
+# MAGIC You can make the change by hand in the metric view editor (Catalog Explorer → `sales_metrics`
+# MAGIC → Edit) by appending `AND NOT is_staff_purchase` to the Net Revenue filter, or use this notebook:
+# MAGIC * `mode = apply` – apply the change.
+# MAGIC * `mode = reset` – put the original definition back.
 # MAGIC
 # MAGIC Uses `ALTER VIEW … AS $$yaml$$`, which keeps grants on the metric view.
 

@@ -1,7 +1,8 @@
 # AI/BI dashboard on the metric views.
 # The .lvdash.json references the metric views by FULL name (swirl_demo.bakery.*):
 # metric view datasets don't pick up dataset_catalog / dataset_schema, so if you
-# change var.catalog or var.schema, edit the two "asset_name" lines in the JSON too.
+# change var.catalog or var.schema, update the two "asset_name" lines in the JSON too
+# (see "Using a different catalog or schema" in the README).
 
 resources:
   dashboards:
