@@ -1,0 +1,13 @@
+command: ["streamlit", "run", "app.py"]
+env:
+  - name: DATABRICKS_WAREHOUSE_ID
+    valueFrom: sql-warehouse
+  # Wired to the Genie space deployed by this bundle (resources/genie_space.yml)
+  - name: GENIE_SPACE_ID
+    valueFrom: genie-space
+  - name: MV_CATALOG
+    value: swirl_demo
+  - name: MV_SCHEMA
+    value: bakery
+  - name: STREAMLIT_BROWSER_GATHER_USAGE_STATS
+    value: "false"

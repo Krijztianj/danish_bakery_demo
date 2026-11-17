@@ -1,0 +1,12 @@
+# AI/BI dashboard on the metric views.
+# The .lvdash.json references the metric views by FULL name (swirl_demo.bakery.*):
+# metric view datasets don't pick up dataset_catalog / dataset_schema, so if you
+# change var.catalog or var.schema, edit the two "asset_name" lines in the JSON too.
+
+resources:
+  dashboards:
+    swirl_monday_morning:
+      display_name: "Swirl & Sons – Monday Morning"
+      file_path: ../dashboard/swirl_monday_morning.lvdash.json
+      warehouse_id: ${var.warehouse_id}
+      embed_credentials: false   # viewers query as themselves, so UC row filters apply

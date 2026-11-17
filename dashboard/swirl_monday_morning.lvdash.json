@@ -1,0 +1,642 @@
+{
+  "datasets": [
+    {
+      "name": "sales",
+      "displayName": "Sales (metric view)",
+      "asset_name": "swirl_demo.bakery.sales_metrics"
+    },
+    {
+      "name": "waste",
+      "displayName": "Waste (metric view)",
+      "asset_name": "swirl_demo.bakery.waste_metrics"
+    }
+  ],
+  "pages": [
+    {
+      "name": "overview",
+      "displayName": "Chain overview",
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layout": [
+        {
+          "widget": {
+            "name": "title",
+            "multilineTextboxSpec": {
+              "lines": [
+                "## Swirl & Sons – Monday Morning\n",
+                "Every number on this page comes from the Unity Catalog metric views `sales_metrics` and `waste_metrics`. No formulas live in this dashboard."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "f_date",
+            "queries": [
+              {
+                "name": "q_sales_date",
+                "query": {
+                  "datasetName": "sales",
+                  "fields": [
+                    {
+                      "name": "order_date",
+                      "expression": "`order_date`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-date-range-picker",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "order_date",
+                    "displayName": "Order Date",
+                    "queryName": "q_sales_date"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Order date"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "f_region",
+            "queries": [
+              {
+                "name": "q_sales_region",
+                "query": {
+                  "datasetName": "sales",
+                  "fields": [
+                    {
+                      "name": "region",
+                      "expression": "`region`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "q_waste_region",
+                "query": {
+                  "datasetName": "waste",
+                  "fields": [
+                    {
+                      "name": "region",
+                      "expression": "`region`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "region",
+                    "displayName": "Region",
+                    "queryName": "q_sales_region"
+                  },
+                  {
+                    "fieldName": "region",
+                    "displayName": "Region",
+                    "queryName": "q_waste_region"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Region"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 2,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "f_channel",
+            "queries": [
+              {
+                "name": "q_sales_channel",
+                "query": {
+                  "datasetName": "sales",
+                  "fields": [
+                    {
+                      "name": "channel",
+                      "expression": "`channel`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-multi-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "channel",
+                    "displayName": "Channel",
+                    "queryName": "q_sales_channel"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Channel"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_net_revenue",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "sales",
+                  "fields": [
+                    {
+                      "name": "net_revenue",
+                      "expression": "MEASURE(`net_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "net_revenue",
+                  "displayName": "Net Revenue"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Net Revenue"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 2,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_gross_margin_pct",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "sales",
+                  "fields": [
+                    {
+                      "name": "gross_margin_pct",
+                      "expression": "MEASURE(`gross_margin_pct`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "gross_margin_pct",
+                  "displayName": "Gross Margin %"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Gross Margin %"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 3,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_avg_basket",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "sales",
+                  "fields": [
+                    {
+                      "name": "avg_basket",
+                      "expression": "MEASURE(`avg_basket`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg_basket",
+                  "displayName": "Average Basket"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Average Basket"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 3,
+            "width": 1,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi_unique_customers",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "sales",
+                  "fields": [
+                    {
+                      "name": "unique_customers",
+                      "expression": "MEASURE(`unique_customers`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "unique_customers",
+                  "displayName": "Unique Customers"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Unique Customers"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 3,
+            "width": 2,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "rev_month_region",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "sales",
+                  "fields": [
+                    {
+                      "name": "order_month",
+                      "expression": "`order_month`"
+                    },
+                    {
+                      "name": "region",
+                      "expression": "`region`"
+                    },
+                    {
+                      "name": "net_revenue",
+                      "expression": "MEASURE(`net_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "order_month",
+                  "scale": {
+                    "type": "temporal"
+                  },
+                  "displayName": "Order Month"
+                },
+                "y": {
+                  "fieldName": "net_revenue",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Net Revenue"
+                },
+                "color": {
+                  "fieldName": "region",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Region"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Net Revenue by month and region"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "rev_store",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "sales",
+                  "fields": [
+                    {
+                      "name": "store_name",
+                      "expression": "`store_name`"
+                    },
+                    {
+                      "name": "net_revenue",
+                      "expression": "MEASURE(`net_revenue`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "net_revenue",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Net Revenue"
+                },
+                "y": {
+                  "fieldName": "store_name",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  },
+                  "displayName": "Store"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Net Revenue by store"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 12,
+            "width": 3,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "cust_store",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "sales",
+                  "fields": [
+                    {
+                      "name": "store_name",
+                      "expression": "`store_name`"
+                    },
+                    {
+                      "name": "unique_customers",
+                      "expression": "MEASURE(`unique_customers`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "unique_customers",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Unique Customers"
+                },
+                "y": {
+                  "fieldName": "store_name",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  },
+                  "displayName": "Store"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Unique Customers by store",
+                "showDescription": true,
+                "description": "Add these up and you get more than the chain total in the KPI above: members shop in several stores."
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 12,
+            "width": 3,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "waste_store",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "waste",
+                  "fields": [
+                    {
+                      "name": "store_name",
+                      "expression": "`store_name`"
+                    },
+                    {
+                      "name": "waste_rate",
+                      "expression": "MEASURE(`waste_rate`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "waste_rate",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Waste Rate"
+                },
+                "y": {
+                  "fieldName": "store_name",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  },
+                  "displayName": "Store"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Waste Rate by store"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 19,
+            "width": 3,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "waste_category",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "waste",
+                  "fields": [
+                    {
+                      "name": "product_category",
+                      "expression": "`product_category`"
+                    },
+                    {
+                      "name": "waste_cost",
+                      "expression": "MEASURE(`waste_cost`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "product_category",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "y-reversed"
+                    }
+                  },
+                  "displayName": "Product Category"
+                },
+                "y": {
+                  "fieldName": "waste_cost",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Waste Cost"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Waste Cost by category"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 19,
+            "width": 3,
+            "height": 7
+          }
+        }
+      ]
+    }
+  ]
+}

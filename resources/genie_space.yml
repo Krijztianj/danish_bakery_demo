@@ -1,0 +1,97 @@
+# Genie Agent (Genie space) on the two metric views – deployed as code.
+# serialized_space follows the Genie space export format (version 2):
+#   - every id is 32 lowercase hex chars, arrays are sorted by id / identifier
+#   - one text instruction per space, benchmarks need exactly one SQL answer
+# Bundle variables are interpolated here, so catalog/schema follow the target.
+
+resources:
+  genie_spaces:
+    swirl_genie:
+      title: "Swirl & Sons – Ask the Bakery"
+      description: "Sales, margin, customers and waste for Swirl & Sons. Every answer goes through the Unity Catalog metric views."
+      warehouse_id: ${var.warehouse_id}
+      serialized_space:
+        version: 2
+        config:
+          sample_questions:
+            - id: "01000000000000000000000000000001"
+              question: ["What was turnover by region last month?"]
+            - id: "01000000000000000000000000000002"
+              question: ["How did gross margin % develop month by month since January 2025?"]
+            - id: "01000000000000000000000000000003"
+              question: ["What happened to cinnamon swirl sales and margin on Fridays in Copenhagen after March 2026?"]
+            - id: "01000000000000000000000000000004"
+              question: ["Which store wastes the most bread, and what does it cost us?"]
+            - id: "01000000000000000000000000000005"
+              question: ["Who are our customers in the morning rush vs at lunch?"]
+        data_sources:
+          metric_views:
+            - identifier: ${var.catalog}.${var.schema}.sales_metrics
+              description: ["Sales semantic layer: revenue, margin, basket, customers. Grain: order line."]
+            - identifier: ${var.catalog}.${var.schema}.waste_metrics
+              description: ["Production and waste per store, product and bake date. Drinks excluded."]
+        instructions:
+          text_instructions:
+            - id: "03000000000000000000000000000001"
+              content:
+                - "You answer questions for Swirl & Sons, a Danish bakery chain with 11 stores and a Webshop & App.\n"
+                - "- Revenue ALWAYS means the Net Revenue measure (DKK excl. VAT, after discounts, excl. refunds). Never use Gross Sales for revenue questions.\n"
+                - "- Margin means Gross Margin %, unless the user asks for an amount in DKK.\n"
+                - "- Average basket means the Average Basket measure (revenue per order), never an average of lines.\n"
+                - "- \"Copenhagen\" means region = 'Capital Region'.\n"
+                - "- \"Last month\" means the last complete calendar month.\n"
+                - "- Amounts are in DKK (Danish kroner).\n"
+                - "- Waste questions use waste_metrics; sales questions use sales_metrics.\n"
+          example_question_sqls:
+            - id: "04000000000000000000000000000001"
+              question: ["What was net revenue by region last month?"]
+              sql:
+                - "SELECT region, MEASURE(net_revenue) AS net_revenue\n"
+                - "FROM ${var.catalog}.${var.schema}.sales_metrics\n"
+                - "WHERE order_month = date_trunc('MONTH', add_months(current_date(), -1))\n"
+                - "GROUP BY ALL ORDER BY net_revenue DESC"
+            - id: "04000000000000000000000000000002"
+              question: ["Waste rate for bread by store in the last 3 months"]
+              sql:
+                - "SELECT store_name, MEASURE(waste_rate) AS waste_rate, MEASURE(waste_cost) AS waste_cost\n"
+                - "FROM ${var.catalog}.${var.schema}.waste_metrics\n"
+                - "WHERE product_category = 'Bread' AND bake_date >= add_months(current_date(), -3)\n"
+                - "GROUP BY ALL ORDER BY waste_rate DESC"
+        benchmarks:
+          questions:
+            - id: "02000000000000000000000000000001"
+              question: ["What was net revenue last month?"]
+              answer:
+                - format: SQL
+                  content:
+                    - "SELECT MEASURE(net_revenue) FROM ${var.catalog}.${var.schema}.sales_metrics\n"
+                    - "WHERE order_month = date_trunc('MONTH', add_months(current_date(), -1))"
+            - id: "02000000000000000000000000000002"
+              question: ["Average basket by store format last month"]
+              answer:
+                - format: SQL
+                  content:
+                    - "SELECT store_format, MEASURE(avg_basket) FROM ${var.catalog}.${var.schema}.sales_metrics\n"
+                    - "WHERE order_month = date_trunc('MONTH', add_months(current_date(), -1)) GROUP BY ALL"
+            - id: "02000000000000000000000000000003"
+              question: ["Waste rate for bread by store in the last 3 months"]
+              answer:
+                - format: SQL
+                  content:
+                    - "SELECT store_name, MEASURE(waste_rate) FROM ${var.catalog}.${var.schema}.waste_metrics\n"
+                    - "WHERE product_category = 'Bread' AND bake_date >= add_months(current_date(), -3) GROUP BY ALL"
+            - id: "02000000000000000000000000000004"
+              question: ["How many unique customers did we have in Aarhus in October 2026?"]
+              answer:
+                - format: SQL
+                  content:
+                    - "SELECT MEASURE(unique_customers) FROM ${var.catalog}.${var.schema}.sales_metrics\n"
+                    - "WHERE city = 'Aarhus' AND order_month = '2026-10-01'"
+            - id: "02000000000000000000000000000005"
+              question: ["Gross margin % for Cinnamon Swirl on Fridays in Copenhagen since March 2026"]
+              answer:
+                - format: SQL
+                  content:
+                    - "SELECT MEASURE(gross_margin_pct) FROM ${var.catalog}.${var.schema}.sales_metrics\n"
+                    - "WHERE product_name = 'Cinnamon Swirl' AND weekday = 'Friday' AND region = 'Capital Region'\n"
+                    - "  AND order_date >= '2026-03-06'"

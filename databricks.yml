@@ -1,0 +1,87 @@
+bundle:
+  name: swirl-metric-views-demo
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Catalog for the demo (created by the setup notebook if allowed)
+    default: swirl_demo
+  schema:
+    description: Schema for the demo
+    default: bakery
+  scale:
+    description: Data volume. 0.5 ≈ 5M order lines, 1.0 ≈ 10M
+    default: "0.5"
+  warehouse_id:
+    description: Serverless SQL warehouse used by the app, dashboard, Genie and Power BI
+  powerbi_workspace:
+    description: Name of the Power BI workspace (PPU / Premium / Fabric) to publish to
+    default: "Swirl Demo"
+  powerbi_connection:
+    description: Name of the Unity Catalog connection of type Power BI
+    default: "powerbi"
+  powerbi_model_name:
+    description: Name of the Power BI semantic model
+    default: "Swirl Sales (metric view)"
+
+resources:
+  jobs:
+    swirl_setup:
+      name: "Swirl & Sons – 1. Build demo data and metric views"
+      tasks:
+        - task_key: create_schema
+          notebook_task:
+            notebook_path: ./src/00_setup.py
+            base_parameters: {catalog: "${var.catalog}", schema: "${var.schema}"}
+        - task_key: generate_data
+          depends_on: [{task_key: create_schema}]
+          notebook_task:
+            notebook_path: ./src/01_generate_data.py
+            base_parameters: {catalog: "${var.catalog}", schema: "${var.schema}", scale: "${var.scale}"}
+        - task_key: metric_views
+          depends_on: [{task_key: generate_data}]
+          notebook_task:
+            notebook_path: ./src/02_create_metric_views.py
+            base_parameters: {catalog: "${var.catalog}", schema: "${var.schema}"}
+        - task_key: legacy_views
+          depends_on: [{task_key: generate_data}]
+          notebook_task:
+            notebook_path: ./src/03_legacy_views.py
+            base_parameters: {catalog: "${var.catalog}", schema: "${var.schema}"}
+
+    # Nightly refresh keeps "yesterday" and "last month" current up to the demo day.
+    swirl_refresh:
+      name: "Swirl & Sons – 2. Nightly data refresh"
+      schedule:
+        quartz_cron_expression: "0 30 4 * * ?"
+        timezone_id: Europe/Copenhagen
+        pause_status: PAUSED   # unpause the week before the talk
+      tasks:
+        - task_key: generate_data
+          notebook_task:
+            notebook_path: ./src/01_generate_data.py
+            base_parameters: {catalog: "${var.catalog}", schema: "${var.schema}", scale: "${var.scale}"}
+
+  apps:
+    swirl_cockpit:
+      name: swirl-store-cockpit
+      description: "Store Cockpit – every number from Unity Catalog metric views"
+      source_code_path: ./app
+      user_api_scopes: [sql, dashboards.genie]
+      resources:
+        - name: sql-warehouse
+          sql_warehouse:
+            id: ${var.warehouse_id}
+            permission: CAN_USE
+        - name: genie-space
+          genie_space:
+            name: swirl-genie
+            space_id: ${resources.genie_spaces.swirl_genie.id}
+            permission: CAN_RUN
+
+targets:
+  dev:
+    mode: development
+    default: true

@@ -1,0 +1,19 @@
+# Databricks CLI bundle state (contains workspace host, user paths, resource IDs)
+.databricks/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local env / secrets
+.env
+.env.*
+.databrickscfg
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

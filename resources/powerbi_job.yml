@@ -1,0 +1,28 @@
+# Publishes (and republishes) the sales_metrics metric view to Power BI as a
+# DirectQuery semantic model. Run it once to create the model, and again after
+# every metric view change (e.g. the live CFO change).
+#
+# Prereq: a Unity Catalog connection of type Power BI (set var.powerbi_connection)
+# and a Power BI workspace in PPU / Premium / Fabric capacity with XMLA read-write.
+
+resources:
+  jobs:
+    swirl_publish_powerbi:
+      name: "Swirl & Sons – 3. Publish Swirl to Power BI"
+      tasks:
+        - task_key: publish_sales_metrics
+          power_bi_task:
+            warehouse_id: ${var.warehouse_id}
+            connection_resource_name: ${var.powerbi_connection}
+            refresh_after_update: true
+            power_bi_model:
+              workspace_name: ${var.powerbi_workspace}
+              model_name: ${var.powerbi_model_name}
+              storage_mode: DIRECT_QUERY
+              authentication_method: OAUTH
+              overwrite_existing: true
+            tables:
+              - catalog: ${var.catalog}
+                schema: ${var.schema}
+                name: sales_metrics
+                storage_mode: DIRECT_QUERY

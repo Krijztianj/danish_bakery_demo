@@ -1,0 +1,98 @@
+version: 1.1
+comment: >-
+  Swirl & Sons production and waste. Grain: store × product × bake date.
+  Drinks are made to order and therefore not included.
+source: ${catalog}.${schema}.fact_production
+
+joins:
+  - name: store
+    source: ${catalog}.${schema}.dim_store
+    'on': source.store_id = store.store_id
+  - name: product
+    source: ${catalog}.${schema}.dim_product
+    'on': source.product_id = product.product_id
+
+fields:
+  - name: bake_date
+    expr: source.bake_date
+    display_name: Bake Date
+    synonyms: [date, day, production date]
+  - name: bake_week
+    expr: DATE_TRUNC('WEEK', source.bake_date)
+    display_name: Bake Week
+    synonyms: [week]
+  - name: bake_month
+    expr: DATE_TRUNC('MONTH', source.bake_date)
+    display_name: Bake Month
+    synonyms: [month]
+  - name: weekday
+    expr: DATE_FORMAT(source.bake_date, 'EEEE')
+    display_name: Weekday
+    synonyms: [day of week]
+  - name: store_name
+    expr: store.store_name
+    display_name: Store
+    synonyms: [store, shop, bakery, location]
+  - name: city
+    expr: store.city
+    display_name: City
+    synonyms: []
+  - name: region
+    expr: store.region
+    display_name: Region
+    synonyms: []
+  - name: store_format
+    expr: store.store_format
+    display_name: Store Format
+  - name: product_name
+    expr: product.product_name
+    display_name: Product
+    synonyms: [product, item, pastry]
+  - name: product_category
+    expr: product.category
+    display_name: Product Category
+    synonyms: [category]
+
+  # measure inputs (needed for Power BI publishing)
+  - name: produced_units
+    expr: source.produced_units
+    comment: '[measure input] Units baked.'
+  - name: sold_units
+    expr: source.sold_units
+    comment: '[measure input] Units sold (not refunded).'
+  - name: wasted_units
+    expr: source.wasted_units
+    comment: '[measure input] Units baked but not sold.'
+  - name: unit_cost
+    expr: source.unit_cost
+    comment: '[measure input] Cost per unit in DKK excl. VAT.'
+
+measures:
+  - name: units_produced
+    expr: SUM(produced_units)
+    display_name: Units Produced
+    format: {type: number, decimal_places: {type: exact, places: 0}, abbreviation: compact}
+    synonyms: [baked, production]
+  - name: units_wasted
+    expr: SUM(wasted_units)
+    display_name: Units Wasted
+    format: {type: number, decimal_places: {type: exact, places: 0}, abbreviation: compact}
+    synonyms: [waste, leftovers, thrown away]
+  - name: waste_rate
+    expr: SUM(wasted_units) / SUM(produced_units)
+    display_name: Waste Rate
+    comment: Units wasted divided by units produced. Ratio of sums – never average daily rates.
+    format: {type: percentage, decimal_places: {type: exact, places: 1}}
+    synonyms: [waste %, waste percentage]
+  - name: sell_through
+    expr: SUM(sold_units) / SUM(produced_units)
+    display_name: Sell-through
+    comment: Share of baked units that were sold.
+    format: {type: percentage, decimal_places: {type: exact, places: 1}}
+    synonyms: [sell through rate]
+  - name: waste_cost
+    expr: SUM(wasted_units * unit_cost)
+    display_name: Waste Cost
+    comment: Cost value of wasted units, DKK excl. VAT.
+    format: {type: currency, currency_code: DKK, decimal_places: {type: max, places: 0}, abbreviation: compact}
+    synonyms: [cost of waste]
